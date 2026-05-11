@@ -1,3 +1,10 @@
+// SPDX-License-Identifier: MIT
+//
+// Copyright (c) 2023-2026 Denis Davydkov
+// Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+//
+// Portions of this file have been modified by NVIDIA CORPORATION & AFFILIATES.
+
 import type * as c4 from '@likec4/core'
 import { assignTagColors } from '@likec4/core/styles'
 import { exact, FqnRef } from '@likec4/core/types'
@@ -187,30 +194,40 @@ export class MergedSpecification {
     links,
     id,
     title,
+    isBidirectional,
     ...model
   }: ParsedAstRelation): c4.Relationship | null => {
+    const bidirectionalTail = (relationship: c4.Relationship): c4.Relationship =>
+      isBidirectional && !relationship.tail
+        ? { ...relationship, tail: relationship.head ?? 'normal' }
+        : relationship
+
     if (isNonNullish(kind) && this.specs.relationships[kind]) {
       const { multiple: _multiple, ...spec } = this.specs.relationships[kind]
-      return {
-        ...spec,
-        ...model,
+      return bidirectionalTail(
+        {
+          ...spec,
+          ...model,
+          ...(links && { links }),
+          // Relation has no own title -> inherit from specification (if any)
+          title: isEmptyish(title) ? (spec.title ?? title) : title,
+          source,
+          target,
+          kind,
+          id,
+        } satisfies c4.Relationship,
+      )
+    }
+    return bidirectionalTail(
+      {
         ...(links && { links }),
-        // Relation has no own title -> inherit from specification (if any)
-        title: isEmptyish(title) ? (spec.title ?? title) : title,
+        ...model,
         source,
         target,
-        kind,
         id,
-      } satisfies c4.Relationship
-    }
-    return {
-      ...(links && { links }),
-      ...model,
-      title,
-      source,
-      target,
-      id,
-    } satisfies c4.Relationship
+        title,
+      } satisfies c4.Relationship,
+    )
   }
 
   /**

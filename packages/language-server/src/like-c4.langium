@@ -164,6 +164,7 @@ ExtendElementOrRelation:
       (
         dotKind=RelationKindDotRef |
         '-[' kind=[RelationshipKind] ']->' |
+        isBidirectional?='<->' |
         '->'
       )
       target=FqnRef
@@ -250,6 +251,7 @@ Relation<isExplicit>:
   (
     dotKind=RelationKindDotRef |
     '-[' kind=[RelationshipKind] ']->' |
+    isBidirectional?='<->' |
     '->'
   )
   target=FqnRef
