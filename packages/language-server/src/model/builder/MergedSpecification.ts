@@ -197,14 +197,18 @@ export class MergedSpecification {
     isBidirectional,
     ...model
   }: ParsedAstRelation): c4.Relationship | null => {
-    const bidirectionalTail = (relationship: c4.Relationship): c4.Relationship =>
-      isBidirectional && !relationship.tail
-        ? { ...relationship, tail: relationship.head ?? 'normal' }
+    const bidirectionalRelationship = (relationship: c4.Relationship): c4.Relationship =>
+      isBidirectional
+        ? {
+          ...relationship,
+          isBidirectional,
+          tail: relationship.tail ?? relationship.head ?? 'normal',
+        }
         : relationship
 
     if (isNonNullish(kind) && this.specs.relationships[kind]) {
       const { multiple: _multiple, ...spec } = this.specs.relationships[kind]
-      return bidirectionalTail(
+      return bidirectionalRelationship(
         {
           ...spec,
           ...model,
@@ -218,7 +222,7 @@ export class MergedSpecification {
         } satisfies c4.Relationship,
       )
     }
-    return bidirectionalTail(
+    return bidirectionalRelationship(
       {
         ...(links && { links }),
         ...model,

@@ -163,7 +163,7 @@ ExtendElementOrRelation:
       source=FqnRef
       (
         dotKind=RelationKindDotRef |
-        '-[' kind=[RelationshipKind] ']->' |
+        '-[' kind=[RelationshipKind] (isBidirectional?=']<->' | ']->') |
         isBidirectional?='<->' |
         '->'
       )
@@ -250,7 +250,7 @@ Relation<isExplicit>:
   (<isExplicit> source=FqnRef | <!isExplicit> source=FqnRef?)
   (
     dotKind=RelationKindDotRef |
-    '-[' kind=[RelationshipKind] ']->' |
+    '-[' kind=[RelationshipKind] (isBidirectional?=']<->' | ']->') |
     isBidirectional?='<->' |
     '->'
   )
